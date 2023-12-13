@@ -1,5 +1,5 @@
 import nextcord
-from nextcord import Interaction, Member, Forbidden, HTTPException
+from nextcord import Interaction, Member
 from datetime import timedelta
 from nextcord.ext.commands import Cog, Bot
 
