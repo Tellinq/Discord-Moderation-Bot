@@ -1,12 +1,11 @@
-import nextcord
-from nextcord import Interaction
-from nextcord.ext.commands import Cog, Bot
+from disnake.ext.commands import Cog, Bot, slash_command
+from disnake import ApplicationCommandInteraction
 
-class AutoMod(Cog):
+class AutoModCommand(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
-    @nextcord.slash_command()
-    async def automod(self, interaction: Interaction): pass
+    @slash_command()
+    async def automod(self, interaction: ApplicationCommandInteraction): pass
 
-    @automod.subcommand("add")
-    async def add(interaction: Interaction): pass
+    @automod.sub_command("add")
+    async def add(interaction: ApplicationCommandInteraction): pass
