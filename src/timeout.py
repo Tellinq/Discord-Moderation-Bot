@@ -18,7 +18,7 @@ class TimeoutCommand(Cog):
         except Exception as e:
             await interaction.response.send_message(e, ephemeral=True)
 
-    @timeout.sub_command("remove")
+    @timeout.sub_command()
     async def remove(self, interaction: ApplicationCommandInteraction, member: Member, reason: str):
         try:
             await member.timeout(duration=None, reason=reason)
