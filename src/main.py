@@ -1,11 +1,32 @@
-from disnake.ext.commands import InteractionBot
-from timeout import TimeoutCommand
-from automod import AutoModCommand
-from os import environ
+import logging
+import os
 
-bot = InteractionBot()
-bot.add_cog(TimeoutCommand(bot))
-bot.add_cog(AutoModCommand(bot))
+import disnake
+from disnake.ext import commands
 
-if __name__ == "__main__" and "TOKEN" in environ:
-    bot.run(environ["TOKEN"])
+def main():
+
+    logger = logging.getLogger("disnake")
+    logger.setLevel(logging.DEBUG)
+    handler = logging.FileHandler(filename="disnake.log", encoding="utf-8", mode="w")
+    handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+    logger.addHandler(handler)
+
+    bot = commands.InteractionBot(
+        reload=True, # Hot reloading, only use for dev testing
+        intents=disnake.Intents.all(),
+        test_guilds=[1184304033834467440]
+    )
+
+    @bot.event
+    async def on_ready():
+        print(f"Sucessfully logged in as {bot.user.name}.\n")
+        
+    os.chdir(os.path.dirname(__file__))
+    bot.load_extensions("cogs")
+    
+    bot.run(os.environ["TOKEN"])
+
+
+if __name__ == "__main__":
+    main()
