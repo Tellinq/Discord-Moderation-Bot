@@ -16,7 +16,8 @@ async def main():
         test_guilds=[1184304033834467440]
     )
     
-    bot.load_extensions("exts")
+    bot.load_extensions("exts/commands")
+    bot.load_extensions("exts/listeners")
     await bot.start(os.environ["TOKEN"])
 
 
