@@ -6,8 +6,12 @@ plugin = plugins.Plugin()
 
 
 @plugin.slash_command()
-async def whois(inter: disnake.CmdInter, target: disnake.User):
-    
+async def info(inter: disnake.CmdInter):
+    pass
+
+
+@info.sub_command()
+async def user(inter: disnake.CmdInter, target: disnake.User):
     """
     Get details about a user/member
 
@@ -16,25 +20,24 @@ async def whois(inter: disnake.CmdInter, target: disnake.User):
     target: The user/member to get details of
     """
     
-    embed = disnake.Embed()
-    embed.set_author(name=f"{target}", icon_url=target.display_avatar)
+    embed = disnake.Embed(title=target)
     embed.set_thumbnail(target.display_avatar)
     
     embed.add_field(
         "ID",
-        target.id,
+        f"`{target.id}`",
         inline=False
     )
     
     embed.add_field(
-        "Creation Date",
+        "Created",
         disnake.utils.format_dt(target.created_at, "R"),
         inline=False
     )
     
     if isinstance(target, disnake.Member):
         embed.add_field(
-            "Join Date",
+            "Joined",
             disnake.utils.format_dt(target.joined_at, "R"),
             inline=False
         )
@@ -51,4 +54,37 @@ async def whois(inter: disnake.CmdInter, target: disnake.User):
     await inter.send(embed=embed)
     
     
+@info.sub_command()
+async def server(inter: disnake.CmdInter):
+    """Get details about the server"""
+    
+    embed = disnake.Embed(
+        title=inter.guild.name,
+        description=inter.guild.description
+    )
+    
+    embed.set_thumbnail(inter.guild.icon)
+    
+    embed.add_field(
+        "Owner",
+        inter.guild.owner.mention,
+        inline=False
+    )
+    
+    embed.add_field(
+        "Created",
+        disnake.utils.format_dt(inter.guild.created_at, "R"),
+        inline=False
+    )
+    
+    embed.add_field(
+        "Members",
+        inter.guild.member_count,
+        inline=False
+    )
+    
+    await inter.send(embed=embed)
+    
+
+
 setup, teardown = plugin.create_extension_handlers()
