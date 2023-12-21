@@ -20,14 +20,12 @@ async def user(inter: disnake.CmdInter, target: disnake.User):
     target: The user/member to get details of
     """
     
-    embed = disnake.Embed(title=target)
-    embed.set_thumbnail(target.display_avatar)
+    # format the username based on if they are still using discrims or not
+    username = f"@{target}" if target.discriminator == "0" else target
     
-    embed.add_field(
-        "ID",
-        f"`{target.id}`",
-        inline=False
-    )
+    embed = disnake.Embed(title=username)
+    embed.set_footer(text=f"ID: {target.id}")
+    embed.set_thumbnail(target.display_avatar)
     
     embed.add_field(
         "Created",
@@ -44,10 +42,10 @@ async def user(inter: disnake.CmdInter, target: disnake.User):
         
         roles = target.roles[1:] # exclude @everyone
         
-        if len(roles) > 0:
+        if roles:
             embed.add_field(
                 f"Roles [{len(roles)}]",
-                "".join(role.mention for role in roles),
+                ", ".join(role.mention for role in roles),
                 inline=False
             )
         

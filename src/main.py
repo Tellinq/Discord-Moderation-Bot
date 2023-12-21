@@ -13,7 +13,7 @@ async def main():
     bot = commands.InteractionBot(
         reload=True,
         intents=disnake.Intents.all(),
-        test_guilds=[1184304033834467440]
+        test_guilds=[1184304033834467440, 1187465948505063597]
     )
     
     bot.load_extensions("exts/commands")
