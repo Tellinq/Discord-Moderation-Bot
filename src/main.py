@@ -7,13 +7,19 @@ from disnake.ext import commands
 
 
 async def main():
-    
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='[%(levelname)s] %(message)s',
+        
+        handlers=[
+            logging.StreamHandler(), 
+            logging.FileHandler("bot.log", mode="w", encoding="utf-8")]
+    )
 
     bot = commands.InteractionBot(
         reload=True,
         intents=disnake.Intents.all(),
-        test_guilds=[1184304033834467440, 1187465948505063597]
+        test_guilds=[1187465948505063597]
     )
     
     bot.load_extensions("exts/commands")

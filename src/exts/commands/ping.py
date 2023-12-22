@@ -1,5 +1,5 @@
 import disnake
-from disnake.ext import plugins, commands
+from disnake.ext import plugins
 
 
 plugin = plugins.Plugin()
