@@ -16,9 +16,10 @@ async def bot(inter: disnake.CmdInter):
 
     embed = disnake.Embed(title=plugin.bot.user.name)
     embed.set_thumbnail(plugin.bot.user.display_avatar)
-    embed.add_field("Latency", f"{round(plugin.bot.latency * 1000)}ms", inline=True)
-    embed.add_field("Servers Joined", len(plugin.bot.guilds), inline=True)
-    embed.add_field("Commands", len(plugin.bot.slash_commands), inline=True)
+    
+    embed.add_field("Latency", f"{round(plugin.bot.latency * 1000)}ms", inline=False)
+    embed.add_field("Servers Joined", len(plugin.bot.guilds), inline=False)
+    embed.add_field("Commands", len(plugin.bot.slash_commands), inline=False)
 
     await inter.send(embed=embed)
 
