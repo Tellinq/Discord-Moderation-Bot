@@ -11,7 +11,21 @@ async def info(inter: disnake.CmdInter):
 
 
 @info.sub_command()
-async def user(inter: disnake.CmdInter, target: disnake.User):
+async def bot(inter: disnake.CmdInter):
+    """Get details about the bot"""
+
+    embed = disnake.Embed(title=plugin.bot.user.name)
+    embed.set_thumbnail(plugin.bot.user.display_avatar)
+    
+    embed.add_field("Latency", f"{round(plugin.bot.latency * 1000)}ms", inline=False)
+    embed.add_field("Servers Joined", len(plugin.bot.guilds), inline=False)
+    embed.add_field("Commands", len(plugin.bot.slash_commands), inline=False)
+
+    await inter.send(embed=embed)
+
+
+@info.sub_command()
+async def user(inter: disnake.CmdInter, target: disnake.User = None):
     """
     Get details about a user/member
 
@@ -19,6 +33,9 @@ async def user(inter: disnake.CmdInter, target: disnake.User):
     ----------
     target: The user/member to get details of
     """
+
+    if target is None:
+        target = inter.author
     
     # format the username based on if they are still using discrims or not
     username = f"@{target}" if target.discriminator == "0" else target
