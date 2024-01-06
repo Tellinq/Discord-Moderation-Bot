@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 import disnake
 from disnake.ext import commands
 
+from prisma import Prisma
+
 
 async def main():
     load_dotenv()
@@ -30,6 +32,9 @@ async def main():
             )
         ]
     )
+
+    db = Prisma()
+    db.connect()
 
     bot = commands.InteractionBot(
         reload=True,
