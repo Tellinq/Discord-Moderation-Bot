@@ -26,7 +26,6 @@ async def main():
                 backupCount=7,
             )
         ]
-    )
 
     bot = commands.InteractionBot(
         reload=True,
