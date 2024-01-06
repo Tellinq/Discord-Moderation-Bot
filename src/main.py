@@ -3,12 +3,15 @@ import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
+from dotenv import load_dotenv 
 
 import disnake
 from disnake.ext import commands
 
 
 async def main():
+    load_dotenv()
+
     log_file = Path("../logs/bot.log")
     log_file.parent.mkdir(exist_ok=True)
     
@@ -26,6 +29,7 @@ async def main():
                 backupCount=7,
             )
         ]
+    )
 
     bot = commands.InteractionBot(
         reload=True,
@@ -35,7 +39,7 @@ async def main():
     
     bot.load_extensions("exts/commands")
     bot.load_extensions("exts/listeners")
-    await bot.start(os.environ["TOKEN"])
+    await bot.start(os.getenv("TOKEN"))
 
 
 if __name__ == "__main__":
