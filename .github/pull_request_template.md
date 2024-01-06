@@ -10,7 +10,10 @@ I ACKNOWLEDGE THE FOLLOWING BEFORE PROCEEDING:
 # Description of your changes
 <!-- Explain in technical detail of what your changes intend to bring to this project. -->
 
-# What changes will the user experience?
+# What changes will the developer experience?
+<!-- If this is not applicable, remove this section -->
+
+# What changes will the end-user experience?
 <!-- Explain everything in a concise manner as this paragraph will be used directly in the changelog -->
 <!-- If your changes are purely internal, you may remove this section -->
 
@@ -23,7 +26,9 @@ I ACKNOWLEDGE THE FOLLOWING BEFORE PROCEEDING:
 # Validation Requirements
 <!-- Do not just check these boxes, **prove** you did the changes. -->
 
-How did you test these changes?
+## How did you test these changes?
+
+### Checklist
 - [ ] Do your latest changes result in a successful build?
 - [ ] Did you thoroughly test the changes for your intended behavior? 
 
