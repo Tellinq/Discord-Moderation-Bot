@@ -7,6 +7,8 @@ from pathlib import Path
 import disnake
 from disnake.ext import commands
 
+from prisma import Prisma
+
 
 async def main():
     log_file = Path("../logs/bot.log")
@@ -26,6 +28,10 @@ async def main():
                 backupCount=7,
             )
         ]
+    )
+
+    db = Prisma()
+    db.connect()
 
     bot = commands.InteractionBot(
         reload=True,
