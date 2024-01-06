@@ -9,27 +9,24 @@ from disnake.ext import commands
 
 
 async def main():
-    logger = logging.getLogger()
-
-    log_file = Path("logs/bot.log")
+    log_file = Path("../logs/bot.log")
     log_file.parent.mkdir(exist_ok=True)
+    
+    logging.basicConfig(
+        format="%(asctime)s | %(name)s: [%(levelname)s] %(message)s",
+        level=logging.INFO,
 
-    file_handler = TimedRotatingFileHandler(
-        filename=log_file,
-        when="midnight",
-        utc=True,
-        backupCount=7,
-        encoding="utf-8"
+        handlers=[
+            logging.StreamHandler(),
+            TimedRotatingFileHandler(
+                filename=log_file,
+                encoding="utf-8",
+                when="midnight",
+                utc=True,
+                backupCount=7,
+            )
+        ]
     )
-
-    file_handler.setFormatter(logging.Formatter("%(asctime)s | %(name)s: [%(levelname)s] %(message)s"))
-    file_handler.setLevel(logging.INFO)
-    logger.addHandler(file_handler)
-
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(logging.Formatter("%(name)s: [%(levelname)s] %(message)s"))
-    stream_handler.setLevel(logging.WARNING)
-    logger.addHandler(stream_handler)
 
     bot = commands.InteractionBot(
         reload=True,
