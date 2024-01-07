@@ -13,7 +13,7 @@ async def on_slash_command_error(inter: disnake.CmdInter, error: commands.Comman
     log_msg = f"@{inter.author} ran /{inter.application_command.qualified_name} and it failed due to: {error}"
     logger.error(msg=log_msg)
     
-    await inter.send(content=error, ephemeral=True)
+    await inter.send(content=str(error), ephemeral=True)
 
 
 setup, teardown = plugin.create_extension_handlers()
