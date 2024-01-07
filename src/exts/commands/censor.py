@@ -6,23 +6,23 @@ plugin = plugins.Plugin()
 
 
 @plugin.slash_command()
-async def censor(inter: disnake.CmdInter):
+async def censor(inter: disnake.GuildCommandInteraction):
     pass
 
 
 # TODO:
 @censor.sub_command()
-async def rule(inter: disnake.CmdInter):
+async def rule(inter: disnake.GuildCommandInteraction):
     return
 
 
 @censor.sub_command_group()
-async def word(inter: disnake.CmdInter):
+async def word(inter: disnake.GuildCommandInteraction):
     pass
 
 
 @word.sub_command()
-async def block(inter: disnake.CmdInter, rule: str, phrases: str, exempt_roles: bool = False, exempt_channels: bool = False, send_alert_message: disnake.TextChannel = None, timeout_user: str = None, custom_message: str = None): # type: ignore
+async def block(inter: disnake.GuildCommandInteraction, rule: str, phrases: str, exempt_roles: bool = False, exempt_channels: bool = False, send_alert_message: disnake.TextChannel = None, timeout_user: str = None, custom_message: str = None): # type: ignore
     """
     Block a word from being said in the server
 
@@ -45,7 +45,7 @@ async def block(inter: disnake.CmdInter, rule: str, phrases: str, exempt_roles: 
         actions_list.append(disnake.AutoModBlockMessageAction())
 
     if send_alert_message:
-        actions_list.append(disnake.AutoModSendAlertAction(channel=send_alert_message)) # type: ignore
+        actions_list.append(disnake.AutoModSendAlertAction(channel=send_alert_message))
 
     # if timeout_user:
         # TODO: parse duration of timeout
@@ -59,8 +59,8 @@ async def block(inter: disnake.CmdInter, rule: str, phrases: str, exempt_roles: 
             raise commands.BadArgument("Phrases must be less than 60 characters long.")
         phrases_list.append(phrase.strip())
 
-    await inter.guild.create_automod_rule(name=rule, trigger_type=disnake.AutoModTriggerType.keyword, event_type=disnake.AutoModEventType.message_send, actions=actions_list, trigger_metadata=disnake.AutoModTriggerMetadata(keyword_filter=phrases_list), enabled=True) # type: ignore We can ignore this because this is 100% in a guild
-
+    await inter.guild.create_automod_rule(name=rule, trigger_type=disnake.AutoModTriggerType.keyword, event_type=disnake.AutoModEventType.message_send, actions=actions_list, trigger_metadata=disnake.AutoModTriggerMetadata(keyword_filter=phrases_list), enabled=True)
+    
     # TODO: Add more info to the embed
     embed = disnake.Embed(title="Rule Created", description=f"Rule {rule} has been created with the following settings:\n\n**Phrases:** {', '.join(phrases_list)}", color=disnake.Color.green())
 
