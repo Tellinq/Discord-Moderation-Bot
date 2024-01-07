@@ -12,7 +12,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Infraction {
+model Infractions {
   id        Int      @id
   guildId   String
   userId    String
