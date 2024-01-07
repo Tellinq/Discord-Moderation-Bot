@@ -41,10 +41,14 @@ async def main():
         intents=disnake.Intents.all(),
         test_guilds=[1187465948505063597]
     )
+
+    if (token := os.getenv("TOKEN")) is None:
+        logging.error("Could not get the 'TOKEN' env var")
+        quit(1)
     
     bot.load_extensions("exts/commands")
     bot.load_extensions("exts/listeners")
-    await bot.start(os.getenv("TOKEN"))
+    await bot.start(token)
 
 
 if __name__ == "__main__":

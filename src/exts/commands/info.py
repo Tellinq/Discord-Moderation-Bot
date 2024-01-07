@@ -6,14 +6,14 @@ plugin = plugins.Plugin()
 
 
 @plugin.slash_command()
-async def info(inter: disnake.CmdInter):
+async def info(inter: disnake.GuildCommandInteraction):
+    """Command group related to fetching info"""
     pass
 
 
 @info.sub_command()
-async def bot(inter: disnake.CmdInter):
+async def bot(inter: disnake.GuildCommandInteraction):
     """Get details about the bot"""
-
     embed = disnake.Embed(title=plugin.bot.user.name)
     embed.set_thumbnail(plugin.bot.user.display_avatar)
     
@@ -25,7 +25,7 @@ async def bot(inter: disnake.CmdInter):
 
 
 @info.sub_command()
-async def user(inter: disnake.CmdInter, target: disnake.User = commands.Param(lambda inter: inter.author)):
+async def user(inter: disnake.GuildCommandInteraction, target: disnake.User = commands.Param(lambda inter: inter.author)):
     """
     Get details about a user/member
 
@@ -47,9 +47,14 @@ async def user(inter: disnake.CmdInter, target: disnake.User = commands.Param(la
     )
     
     if isinstance(target, disnake.Member):
+        if target.joined_at:
+            join_date = disnake.utils.format_dt(target.joined_at, "R")
+        else:
+            join_date = "unavailable"
+
         embed.add_field(
             "Joined",
-            disnake.utils.format_dt(target.joined_at, "R"),
+            join_date,
             inline=False
         )
         
@@ -66,9 +71,8 @@ async def user(inter: disnake.CmdInter, target: disnake.User = commands.Param(la
     
     
 @info.sub_command()
-async def server(inter: disnake.CmdInter):
+async def server(inter: disnake.GuildCommandInteraction):
     """Get details about the server"""
-    
     embed = disnake.Embed(
         title=inter.guild.name,
         description=inter.guild.description
@@ -78,7 +82,7 @@ async def server(inter: disnake.CmdInter):
     
     embed.add_field(
         "Owner",
-        inter.guild.owner.mention,
+        inter.guild.owner.mention if inter.guild.owner is not None else "unknown",
         inline=False
     )
     
@@ -96,6 +100,5 @@ async def server(inter: disnake.CmdInter):
     
     await inter.send(embed=embed)
     
-
 
 setup, teardown = plugin.create_extension_handlers()
