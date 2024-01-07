@@ -34,7 +34,7 @@ async def main():
     )
 
     db = Prisma()
-    db.connect()
+    await db.connect()
 
     bot = commands.InteractionBot(
         reload=True,
