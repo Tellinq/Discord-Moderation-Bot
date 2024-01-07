@@ -1,5 +1,5 @@
 import disnake
-from disnake.ext import plugins
+from disnake.ext import plugins, commands
 
 
 plugin = plugins.Plugin()
@@ -25,7 +25,7 @@ async def bot(inter: disnake.CmdInter):
 
 
 @info.sub_command()
-async def user(inter: disnake.CmdInter, target: disnake.User = None):
+async def user(inter: disnake.CmdInter, target: disnake.User = commands.Param(lambda inter: inter.author)):
     """
     Get details about a user/member
 
@@ -33,10 +33,6 @@ async def user(inter: disnake.CmdInter, target: disnake.User = None):
     ----------
     target: The user/member to get details of
     """
-
-    if target is None:
-        target = inter.author
-    
     # format the username based on if they are still using discrims or not
     username = f"@{target}" if target.discriminator == "0" else target
     
