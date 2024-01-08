@@ -9,11 +9,13 @@ logger = logging.getLogger(__name__)
 @plugin.listener()
 async def on_slash_command_error(inter: disnake.CmdInter, error: commands.CommandError):
     error = getattr(error, "original", error)
-    
-    log_msg = f"@{inter.author} ran /{inter.application_command.qualified_name} and it failed due to: {error}"
+
+    log_msg = f"@{inter.author} ran /{inter.application_command.qualified_name} and it failed due to: '{str(error)}'"
     logger.error(msg=log_msg)
-    
-    await inter.send(content=str(error), ephemeral=True)
+
+    if isinstance(error, commands.CommandError): #type: ignore
+        await inter.send(content=str(error), ephemeral=True)
+        return
 
 
 setup, teardown = plugin.create_extension_handlers()

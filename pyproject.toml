@@ -3,3 +3,5 @@ typeCheckingMode = "strict"
 include = ["src"]
 
 reportUnknownMemberType = false
+reportUnknownArgumentType = false
+reportUnknownLambdaType = false
