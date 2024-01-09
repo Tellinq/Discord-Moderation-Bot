@@ -48,18 +48,18 @@ class TimeoutPrompt(disnake.ui.View):
         return True
 
     @disnake.ui.button(label="Overwrite", style=disnake.ButtonStyle.green) 
-    async def overwrite(self, button: disnake.ui.Button, inter: disnake.MessageInteraction): # type: ignore
+    async def overwrite(self, button: disnake.ui.Button[None], inter: disnake.MessageInteraction):
         await self.target.timeout(until=self.timeout_duration, reason=self.reason)
         await inter.response.edit_message(make_timeout_message(self.target, self.reason), components=None)
         self.stop()
 
     @disnake.ui.button(label="Increase", style=disnake.ButtonStyle.primary) 
-    async def increase(self, button: disnake.ui.Button, inter: disnake.MessageInteraction): # type: ignore
+    async def increase(self, button: disnake.ui.Button[None], inter: disnake.MessageInteraction): 
         await inter.response.edit_message("todo", components=None)
         self.stop()
 
     @disnake.ui.button(label="Cancel", style=disnake.ButtonStyle.danger) 
-    async def cancel(self, button: disnake.ui.Button, inter: disnake.MessageInteraction): # type: ignore
+    async def cancel(self, button: disnake.ui.Button[None], inter: disnake.MessageInteraction):
         await inter.response.edit_message("Canceled.", components=None)
         self.stop()
 
