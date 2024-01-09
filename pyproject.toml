@@ -5,3 +5,5 @@ include = ["src"]
 reportUnknownMemberType = false
 reportUnknownArgumentType = false
 reportUnknownLambdaType = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false

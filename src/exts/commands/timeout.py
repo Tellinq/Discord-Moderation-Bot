@@ -1,15 +1,11 @@
 import disnake
-from disnake.ext import plugins, commands
+from disnake.ext import commands, plugins
 
 import datetime
 import dateparser
-import asyncio
-
 
 plugin = plugins.Plugin()
 
-
-TIMEOUT_PROMPT_WAIT_SECS = 45
 
 def parse_punishment_duration(duration: str) -> datetime.datetime:
     settings = {
@@ -19,27 +15,53 @@ def parse_punishment_duration(duration: str) -> datetime.datetime:
     }
     date = dateparser.parse(duration, settings=settings) # type: ignore
     if date is None:
-        raise commands.BadArgument(f"Invalid duration: '{duration}'.") # message can be tweaked
+        raise commands.BadArgument(f"Invalid duration: '{duration}'.")
     return date
-
-
-def hierarchy_check(inter: disnake.GuildCommandInteraction, target: disnake.User | disnake.Member):
-    if inter.guild.owner == target:
-        raise commands.BadArgument("I cannot perform that action on the server owner.")
-    
-    if inter.guild.me == target:
-        raise commands.BadArgument("I cannot perform that action on myself.")
-    
-    if isinstance(target, disnake.Member):
-        if inter.author.top_role <= target.top_role:
-            raise commands.BadArgument("You cannot perform that action on a user higher up or on the same level in the role hierarchy as you.")
-        if inter.guild.me.top_role <= target.top_role:
-            raise commands.BadArgument("I cannot perform that action on a user higher up or on the same level in the role hierarchy as me.")
 
 
 def format_timeout_duration(member: disnake.Member) -> str:
     assert member.current_timeout is not None
     return disnake.utils.format_dt(member.current_timeout, 'R')
+
+
+def make_timeout_message(target: disnake.Member, reason: str) -> str:
+    return f"Timed out {target.mention} for **'{reason}'**.\nExpiry: {format_timeout_duration(target)}."
+    
+
+class TimeoutPrompt(disnake.ui.View):
+    def __init__(self, author: disnake.Member, target: disnake.Member, timeout_duration: datetime.datetime, reason: str):
+        super().__init__(timeout=45.0)
+        self.author = author
+        self.target = target
+        self.timeout_duration = timeout_duration
+        self.reason = reason
+
+    async def on_timeout(self):
+        for child in self.children:
+            if isinstance(child, disnake.ui.Button):
+                self.remove_item(child)
+
+    async def interaction_check(self, interaction: disnake.MessageInteraction) -> bool:
+        if self.author != interaction.author:
+            await interaction.send("You can't do that.", ephemeral=True)
+            return False
+        return True
+
+    @disnake.ui.button(label="Overwrite", style=disnake.ButtonStyle.green) 
+    async def overwrite(self, button: disnake.ui.Button, inter: disnake.MessageInteraction): # type: ignore
+        await self.target.timeout(until=self.timeout_duration, reason=self.reason)
+        await inter.response.edit_message(make_timeout_message(self.target, self.reason), components=None)
+        self.stop()
+
+    @disnake.ui.button(label="Increase", style=disnake.ButtonStyle.primary) 
+    async def increase(self, button: disnake.ui.Button, inter: disnake.MessageInteraction): # type: ignore
+        await inter.response.edit_message("todo", components=None)
+        self.stop()
+
+    @disnake.ui.button(label="Cancel", style=disnake.ButtonStyle.danger) 
+    async def cancel(self, button: disnake.ui.Button, inter: disnake.MessageInteraction): # type: ignore
+        await inter.response.edit_message("Canceled.", components=None)
+        self.stop()
 
 
 @plugin.slash_command()
@@ -62,47 +84,19 @@ async def add(inter: disnake.GuildCommandInteraction, target: disnake.Member, re
     duration: Duration of the timeout
     """
 
-    hierarchy_check(inter, target)
     timeout_duration = parse_punishment_duration(duration)
-
-    make_timeout_message = lambda: (
-        f"Timed out {target.mention}, their timeout expires {format_timeout_duration(target)}. \n"
-        f"Reason: '{reason}'"
-    )
 
     if target.current_timeout is None:
         await target.timeout(until=timeout_duration, reason=reason)
-        await inter.send(make_timeout_message())
+        await inter.send(make_timeout_message(target, reason))
         return
-
+    
     await inter.response.defer()
 
-    expiration = disnake.utils.format_dt(target.current_timeout, "R")
-    await inter.followup.send(
-        f"That user is already timed out. Their timeout expires {expiration}, do you want to overwrite it?",
-        components=[
-            disnake.ui.Button(label="Yes", style=disnake.ButtonStyle.success, custom_id="yes"),
-            disnake.ui.Button(label="No", style=disnake.ButtonStyle.danger, custom_id="no"),
-        ]
-    )
+    view = TimeoutPrompt(inter.author, target, timeout_duration, reason)
 
-    try:
-        choice: disnake.MessageInteraction = await inter.bot.wait_for(
-            "button_click",
-            check=lambda i: i.component.custom_id in {"yes", "no"} and i.author.id == inter.author.id,
-            timeout=TIMEOUT_PROMPT_WAIT_SECS,
-        )
-
-        if choice.component.custom_id == "yes":
-            await target.timeout(until=timeout_duration, reason=reason)
-            message = make_timeout_message()
-        else:
-            message = "Canceled."
-
-    except asyncio.TimeoutError:
-        message = "No option was chosen, canceled."
-
-    await inter.edit_original_response(message, components=[])
+    await inter.send(f"That user is already timed out. Expiry: {format_timeout_duration(target)}, do you want to overwrite it?", view=view)
+    await view.wait()
 
 
 @timeout.sub_command()
@@ -115,8 +109,6 @@ async def remove(inter: disnake.GuildCommandInteraction, target: disnake.Member,
     target: The member to remove timeout from
     reason: The reason for the timeout being removed
     """
-
-    hierarchy_check(inter, target)
 
     if target.current_timeout is None:
         raise commands.BadArgument("That user is not timed out.")
@@ -138,7 +130,7 @@ async def check(inter: disnake.GuildCommandInteraction, target: disnake.Member):
     if target.current_timeout is None:
         raise commands.BadArgument("That user is not timed out.")
     
-    await inter.send(f"{target.mention}'s timeout expires {disnake.utils.format_dt(target.current_timeout, 'R')}")
+    await inter.send(f"{target.mention}'s timeout expires {format_timeout_duration(target)}")
 
 
 setup, teardown = plugin.create_extension_handlers()
